@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import pool from "../config/db.js";
 import jwt from "jsonwebtoken";
+import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 const saltRounds = 10;
@@ -55,8 +56,8 @@ router.post("/login", async (req, res) => {
       const userData = user.rows[0];
       const isMatch = await bcrypt.compare(password, userData.password);
       if (isMatch) {
-        const token = generateToken(newUser.rows[0].id);
-        // Express - cookie
+        const token = generateToken(userData.id);
+        // Express - store token in cookie
         res.cookie("token", token, cookieOptions);
         res
           .status(201)
@@ -69,9 +70,22 @@ router.post("/login", async (req, res) => {
       res.status(400).json({ message: "User hasn't been registered!" });
     }
   } catch (err) {
-    console.error("Login Error:" + err);
+    console.error(err);
     res.json({ message: "Server Error!" });
   }
+});
+
+// Me - proteced route
+router.get("/me", protect, async (req, res) => {
+  // console.log(req.user);
+  // Send login user info from protected middleware
+  res.json(req.user);
+});
+
+// Logout
+router.post("/logout", (req, res) => {
+  res.cookie("token", "", { ...cookieOptions, maxAge: 1 });
+  res.json({ message: "Logout successfully!" });
 });
 
 export default router;

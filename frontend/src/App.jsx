@@ -1,52 +1,51 @@
-import { useState } from "react";
-import generateName from "sillyname";
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
+import axios from "axios";
 import "./App.css";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+
+axios.defaults.withCredentials = true;
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [text, setText] = useState("");
-  const [list, setList] = useState([]);
-  const [name, setName] = useState(generateName());
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const add = () => {
-    setCount((count) => count + 1);
-    setCount((count) => count + 1);
-    console.log(count);
-  };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/api/auth/me`,
+        );
+        console.log(response);
+        const user = response.data;
+        setUser(user);
+      } catch (err) {
+        console.log(err);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
 
-  const addTodo = (e) => {
-    e.preventDefault();
-    setText("");
-    setList([...list, text]);
-  };
-  // console.log(list);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  // console.log(import.meta.env);
   return (
-    <>
-      <p>{count}</p>
-      <p>{text}</p>
-      {name}
-      <button
-        onClick={() => {
-          setName(generateName());
-        }}
-      >
-        Change name
-      </button>
-      <button onClick={add}>Add</button>
-      <ul>
-        {list.map((todo, index) => (
-          <li key={index}>{todo}</li>
-        ))}
-      </ul>
-      <form onSubmit={addTodo}>
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-        <button type="submit">Add todo</button>
-      </form>
-    </>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </Router>
   );
 }
 
