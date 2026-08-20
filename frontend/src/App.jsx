@@ -20,7 +20,7 @@ function App() {
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/auth/me`,
         );
-        console.log(response);
+        // console.log(response);
         const user = response.data;
         setUser(user);
       } catch (err) {
@@ -36,14 +36,14 @@ function App() {
   if (loading) {
     return <div>Loading...</div>;
   }
-  // console.log(import.meta.env);
+
   return (
     <Router>
-      <Navbar />
+      <Navbar user={user} />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/register" element={<Register setUser={setUser} />} />
       </Routes>
     </Router>
   );
