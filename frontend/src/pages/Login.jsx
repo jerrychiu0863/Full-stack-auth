@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Login({ setUser, ...props }) {
-  console.log(props);
+  // console.log(props);
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -19,12 +19,13 @@ function Login({ setUser, ...props }) {
         `${import.meta.env.VITE_BASE_URL}/api/auth/login`,
         data,
       );
-      console.log(response);
-      const user = await response.data;
+
+      const user = await response.data.user;
+      console.log(user);
       setUser(user);
       navigate("/");
     } catch (err) {
-      console.log(err.response);
+      // console.log(err.response);
       const res = await err.response;
       const errorMsg = await res.data.message;
       setError(errorMsg);

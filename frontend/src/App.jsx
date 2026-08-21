@@ -20,11 +20,14 @@ function App() {
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/auth/me`,
         );
-        // console.log(response);
+
         const user = response.data;
+        console.log(user);
         setUser(user);
       } catch (err) {
-        console.log(err);
+        const response = await err.response;
+        const errMsg = response.data.message;
+        setError(errMsg);
         setUser(null);
       } finally {
         setLoading(false);
@@ -39,12 +42,17 @@ function App() {
 
   return (
     <Router>
-      <Navbar user={user} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login setUser={setUser} />} />
-        <Route path="/register" element={<Register setUser={setUser} />} />
-      </Routes>
+      <Navbar user={user} setUser={setUser} />
+      <div className="flex-1 grid place-content-center">
+        <Routes>
+          <Route path="/" element={<Home user={user} errMsg={error} />} />
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/" /> : <Login setUser={setUser} />}
+          />
+          <Route path="/register" element={<Register setUser={setUser} />} />
+        </Routes>
+      </div>
     </Router>
   );
 }

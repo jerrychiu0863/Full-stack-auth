@@ -10,9 +10,10 @@ export const protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // console.log(decoded);
-    const user = await pool.query("SELECT id, email FROM users WHERE id = $1", [
-      decoded.id,
-    ]);
+    const user = await pool.query(
+      "SELECT id, email, login_at FROM users WHERE id = $1",
+      [decoded.id],
+    );
 
     if (user.rows.length === 0) {
       return res

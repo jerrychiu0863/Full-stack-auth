@@ -18,8 +18,9 @@ function Register({ setUser, ...props }) {
         `${import.meta.env.VITE_BASE_URL}/api/auth/register`,
         data,
       );
-      console.log(response);
-      const user = await response.data;
+      // console.log(response);
+      const user = await response.data.user;
+      // console.log(user);
       setUser(user);
       navigate("/");
     } catch (err) {

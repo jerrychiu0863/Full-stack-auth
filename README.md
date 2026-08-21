@@ -8,9 +8,10 @@ This project demonstrates how to build an authentication system from the client 
 
 ### Frontend
 
-- React
+- React / React Router
 - JavaScript
 - HTML / CSS
+- Tailwind
 
 ### Backend
 

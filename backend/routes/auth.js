@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
     if (result.rows.length === 0) {
       bcrypt.hash(password, saltRounds, async (err, hash) => {
         const newUser = await pool.query(
-          "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email",
+          "INSERT INTO users (email, password, login_at) VALUES ($1, $2, NOW()) RETURNING id, email, login_at",
           [email, hash],
         );
         const token = generateToken(newUser.rows[0].id);
@@ -56,12 +56,17 @@ router.post("/login", async (req, res) => {
       const userData = user.rows[0];
       const isMatch = await bcrypt.compare(password, userData.password);
       if (isMatch) {
+        const updatedUser = await pool.query(
+          "UPDATE users SET login_at = NOW() WHERE id = $1 RETURNING id, email,login_at",
+          [userData.id],
+        );
+
         const token = generateToken(userData.id);
         // Express - store token in cookie
         res.cookie("token", token, cookieOptions);
-        res
-          .status(201)
-          .json({ user: { id: userData.id, email: userData.email } });
+        res.status(201).json({
+          user: updatedUser.rows[0],
+        });
         // res.status(200).json({ message: "Login successfully!" });
       } else {
         res.status(400).json({ message: "Wrong password!" });

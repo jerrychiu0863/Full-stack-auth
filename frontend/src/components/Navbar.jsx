@@ -2,14 +2,13 @@ import { useEffect } from "react";
 import axios from "axios";
 import { useNavigate, NavLink } from "react-router-dom";
 
-function Navbar({ user }) {
+function Navbar({ user, setUser }) {
   const navigate = useNavigate();
   const onLogoutClick = async () => {
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/api/auth/logout`,
-      );
-      console.log("logout");
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/api/auth/logout`);
+
+      setUser(null);
       navigate("/");
     } catch (err) {
       console.log(err);
@@ -17,29 +16,35 @@ function Navbar({ user }) {
   };
 
   return (
-    <div className="flex justify-between bg-red-100 py-[16px] px-[8px]">
-      <div>Auth sys</div>
+    <header className="flex justify-between bg-blue-100 py-[16px] px-[8px]">
+      <NavLink to="/">Auth sys</NavLink>
 
       <div>
-        {user?.id ? (
+        {user ? (
           <button
-            className="bg-red-300 px-[8px] rounded-sm"
+            className="border border-blue-400 border-[2px] px-[8px] rounded-sm text-blue-400"
             onClick={onLogoutClick}
           >
             Logout
           </button>
         ) : (
           <div>
-            <NavLink className="bg-red-300 px-[8px] rounded-sm" to="/login">
+            <NavLink
+              className=" px-[8px] border-[2px] px-[8px] rounded-sm text-blue-400 mr-[8px]"
+              to="/login"
+            >
               Login
             </NavLink>
-            <NavLink className="bg-red-300 px-[8px] rounded-sm" to="/register">
+            <NavLink
+              className="px-[8px] border-[2px] px-[8px] rounded-sm text-blue-400"
+              to="/register"
+            >
               Register
             </NavLink>
           </div>
         )}
       </div>
-    </div>
+    </header>
   );
 }
 
